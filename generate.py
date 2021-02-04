@@ -51,7 +51,8 @@ def generate_images(
     noise_mode: str,
     outdir: str,
     class_idx: Optional[int],
-    projected_w: Optional[str]
+    projected_w: Optional[str],
+    w_arr: Optional[np.ndarray]
 ):
     """Generate images using pretrained network pickle.
 
@@ -86,11 +87,13 @@ def generate_images(
     os.makedirs(outdir, exist_ok=True)
 
     # Synthesize the result of a W projection.
-    if projected_w is not None:
-        if seeds is not None:
-            print ('warn: --seeds is ignored when using --projected-w')
-        print(f'Generating images from projected W "{projected_w}"')
-        ws = np.load(projected_w)['w']
+    if projected_w is not None or w_in is not None:
+        if w_in is not None:
+            print("Generating images from w_in")
+            ws = w_in
+        else:
+            print(f'Generating images from projected W "{projected_w}"')
+            ws = np.load(projected_w)['w']
         ws = torch.tensor(ws, device=device) # pylint: disable=not-callable
         assert ws.shape[1:] == (G.num_ws, G.w_dim)
         for idx, w in enumerate(ws):
