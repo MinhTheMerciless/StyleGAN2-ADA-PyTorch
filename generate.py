@@ -34,7 +34,7 @@ def num_range(s: str) -> List[int]:
 
 #----------------------------------------------------------------------------
 
-@click.command()
+@click.command(allow_extra_args=True)
 @click.pass_context
 @click.option('--network', 'network_pkl', help='Network pickle filename', required=True)
 @click.option('--seeds', type=num_range, help='List of random seeds')
