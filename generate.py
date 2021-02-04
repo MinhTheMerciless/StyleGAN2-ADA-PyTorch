@@ -35,10 +35,10 @@ def num_range(s: str) -> List[int]:
 
 def generate_images(
     network_pkl: str,
+    outdir: str,
     seeds = None,
     truncation_psi = 1.0,
-    noise_mode 'const',
-    outdir: str,
+    noise_mode = 'const',
     class_idx = None,
     projected_w = None,
     w_arr = None
