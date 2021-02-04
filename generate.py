@@ -35,7 +35,7 @@ def num_range(s: str) -> List[int]:
 
 def generate_images(
     network_pkl: str,
-    outdir: str,
+    outdir = None,
     seeds = None,
     truncation_psi = 1.0,
     noise_mode = 'const',
@@ -73,8 +73,11 @@ def generate_images(
     with dnnlib.util.open_url(network_pkl) as f:
         G = legacy.load_network_pkl(f)['G_ema'].to(device) # type: ignore
 
-    os.makedirs(outdir, exist_ok=True)
-
+    if outdir is not None:
+        os.makedirs(outdir, exist_ok=True)
+    
+    imgs = []
+    
     # Synthesize the result of a W projection.
     if projected_w is not None or w_arr is not None:
         if w_arr is not None:
@@ -88,8 +91,11 @@ def generate_images(
         for idx, w in enumerate(ws):
             img = G.synthesis(w.unsqueeze(0), noise_mode=noise_mode)
             img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
-            img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/proj{idx:02d}.png')
-        return
+            img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB')
+            if outdir is not None:
+                img.save(f'{outdir}/proj{idx:02d}.png')
+            imgs += img
+        return imgs
 
     # Labels.
     label = torch.zeros([1, G.c_dim], device=device)
@@ -105,7 +111,12 @@ def generate_images(
         z = torch.from_numpy(np.random.RandomState(seed).randn(1, G.z_dim)).to(device)
         img = G(z, label, truncation_psi=truncation_psi, noise_mode=noise_mode)
         img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
-        PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/seed{seed:04d}.png')
+        img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB')
+        if outdir is not None:
+            img.save(f'{outdir}/proj{idx:02d}.png')
+        imgs += img
+    return imgs
+        
 
 
 #----------------------------------------------------------------------------
