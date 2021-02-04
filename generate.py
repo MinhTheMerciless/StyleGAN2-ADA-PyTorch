@@ -87,10 +87,10 @@ def generate_images(
     os.makedirs(outdir, exist_ok=True)
 
     # Synthesize the result of a W projection.
-    if projected_w is not None or w_in is not None:
-        if w_in is not None:
-            print("Generating images from w_in")
-            ws = w_in
+    if projected_w is not None or w_arr is not None:
+        if w_arr is not None:
+            print("Generating images from w_arr")
+            ws = w_arr
         else:
             print(f'Generating images from projected W "{projected_w}"')
             ws = np.load(projected_w)['w']
