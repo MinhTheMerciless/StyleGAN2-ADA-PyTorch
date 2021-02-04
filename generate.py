@@ -12,7 +12,6 @@ import os
 import re
 from typing import List, Optional
 
-import click
 import dnnlib
 import numpy as np
 import PIL.Image
@@ -34,25 +33,15 @@ def num_range(s: str) -> List[int]:
 
 #----------------------------------------------------------------------------
 
-@click.command(allow_extra_args=True)
-@click.pass_context
-@click.option('--network', 'network_pkl', help='Network pickle filename', required=True)
-@click.option('--seeds', type=num_range, help='List of random seeds')
-@click.option('--trunc', 'truncation_psi', type=float, help='Truncation psi', default=1, show_default=True)
-@click.option('--class', 'class_idx', type=int, help='Class label (unconditional if not specified)')
-@click.option('--noise-mode', help='Noise mode', type=click.Choice(['const', 'random', 'none']), default='const', show_default=True)
-@click.option('--projected-w', help='Projection result file', type=str, metavar='FILE')
-@click.option('--outdir', help='Where to save the output images', type=str, required=True, metavar='DIR')
 def generate_images(
-    ctx: click.Context,
     network_pkl: str,
-    seeds: Optional[List[int]],
-    truncation_psi: float,
-    noise_mode: str,
+    seeds = None,
+    truncation_psi = 1.0,
+    noise_mode 'const',
     outdir: str,
-    class_idx: Optional[int],
-    projected_w: Optional[str],
-    w_arr: Optional[np.ndarray]
+    class_idx = None,
+    projected_w = None,
+    w_arr = None
 ):
     """Generate images using pretrained network pickle.
 
@@ -102,14 +91,9 @@ def generate_images(
             img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/proj{idx:02d}.png')
         return
 
-    if seeds is None:
-        ctx.fail('--seeds option is required when not using --projected-w')
-
     # Labels.
     label = torch.zeros([1, G.c_dim], device=device)
     if G.c_dim != 0:
-        if class_idx is None:
-            ctx.fail('Must specify class label with --class when using a conditional network')
         label[:, class_idx] = 1
     else:
         if class_idx is not None:
