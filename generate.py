@@ -93,7 +93,7 @@ def generate_images(
             img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
             img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB')
             if outdir is not None:
-                img.save(f'{outdir}/proj{idx:02d}.png')
+                img.save(f'{outdir}/proj{idx}.png')
             imgs += img
         return imgs
 
@@ -113,7 +113,7 @@ def generate_images(
         img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
         img = PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB')
         if outdir is not None:
-            img.save(f'{outdir}/proj{idx:02d}.png')
+            img.save(f'{outdir}/proj{idx}.png')
         imgs += img
     return imgs
         
